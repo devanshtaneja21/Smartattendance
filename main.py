@@ -4,9 +4,8 @@ import face_recognition
 import os
 from datetime import datetime
 
-# from PIL import ImageGrab
 
-path = 'Training_images'
+path = 'Training_test'
 images = []
 classNames = []
 myList = os.listdir(path)
@@ -24,7 +23,11 @@ def findEncodings(images):
 
     for img in images:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encode = face_recognition.face_encodings(img)[0]
+        # cv2.imshow("window",img)
+        # cv2.waitKey(1)        
+        encode = face_recognition.face_encodings(img)
+        if len(encode) > 1:
+            encode=encode[0]
         encodeList.append(encode)
     return encodeList
 
