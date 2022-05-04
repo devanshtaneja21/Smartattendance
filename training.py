@@ -3,9 +3,40 @@ import numpy as np
 import face_recognition
 import os
 import pickle
+import requests
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
+try:
+    cred = credentials.Certificate("firebase_cred.json")
+    firebase_admin.initialize_app(cred,{'databaseURL':"https://smartattendance-59a5b-default-rtdb.asia-southeast1.firebasedatabase.app/",
+                                        })
+except:
+    print("Init Skipped")
 
-path = 'Training_test'
+path = 'Training_folder'
+
+existing_photos = os.listdir(path)
+
+print("Fetching Image Please Wait...")
+
+ref = db.reference("/Employees")
+data = ref.get()
+for key in data:
+    name = data[key]['name'].strip()
+    id = data[key]['id'].strip()
+    url = data[key]['photo']
+    image_name = name+"_"+id+".jpg"
+    if image_name in existing_photos:
+        continue
+    img_data = requests.get(url).content
+    with open(path+"/"+image_name,"wb") as f:
+        f.write(img_data)
+
+print("Images Fetched")
+print("Training Started...")
+
 encodeList = []
 nameList = []
 myList = os.listdir(path)
